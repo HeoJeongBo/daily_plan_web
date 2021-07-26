@@ -1,8 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { fireStore } from "./firebase/firebaseInit";
 
 function App() {
+  useEffect(() => {
+    fireStore
+      .collection("test")
+      .doc("frienddd")
+      .set({ abc: "123" })
+      .then((doc) => {
+        console.log(doc);
+      });
+  }, []);
+
   return (
     <div className="App">
       <header className="App-header">
