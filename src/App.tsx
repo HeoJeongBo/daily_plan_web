@@ -3,6 +3,7 @@ import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import "./App.scss";
 import { fireStore } from "./firebase/firebaseInit";
 import Main from "./components/main/Main";
+import { UserProvider } from "./providers/user";
 
 function App() {
     // useEffect(() => {
@@ -16,11 +17,13 @@ function App() {
     // }, []);
 
     return (
-        <Router>
-            <Switch>
-                <Route path="/" component={Main} />
-            </Switch>
-        </Router>
+        <UserProvider>
+            <Router>
+                <Switch>
+                    <Route path="/" component={Main} />
+                </Switch>
+            </Router>
+        </UserProvider>
     );
 }
 

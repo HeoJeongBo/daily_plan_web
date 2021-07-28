@@ -1,6 +1,7 @@
 import React, { FocusEvent, useState } from "react";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import MainLeftImage from "../../assets/images/main_image.svg";
+import { useUser } from "../../providers/user";
 import type { LoginFormId } from "../../types/main/types";
 
 const Main: React.FC = () => {

@@ -1,4 +1,4 @@
-import React, { createContext, Dispatch, useReducer } from "react";
+import React, { createContext, Dispatch, useContext, useReducer } from "react";
 
 type User = {
     email: string;
@@ -25,6 +25,7 @@ type ActionType = Pick<Action, "type">;
 
 type UserDispatch = Dispatch<Action>;
 
+// state와 dispatch 각각 context로 관리
 const UserStateContext = createContext<User>(initialState);
 const UserDispatchContext = createContext<UserDispatch>(() => null);
 
@@ -50,4 +51,14 @@ export function UserProvider({ children }: { children: JSX.Element }) {
             </UserDispatchContext.Provider>
         </UserStateContext.Provider>
     );
+}
+
+export function useUser() {
+    const state = useContext(UserStateContext);
+    const dispatch = useContext(UserDispatchContext);
+    if (!state || !dispatch) {
+        throw new Error("Cannot find UserProvider");
+    }
+
+    return [state, dispatch];
 }
