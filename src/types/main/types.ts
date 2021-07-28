@@ -1,0 +1,1 @@
+export type LoginFormId = 'id' | 'password' | null;
