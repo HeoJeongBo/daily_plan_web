@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from "react";
+import React from "react";
 import { History } from "history";
 import { Button, createStyles, makeStyles, Theme } from "@material-ui/core";
 import paths from "../../constants/path";
