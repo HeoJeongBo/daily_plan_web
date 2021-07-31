@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import "./App.scss";
 import { fireStore } from "./firebase/firebaseInit";
-import Main from "./components/main/Main";
 import { UserProvider } from "./providers/user";
+import { SignUp, Main } from "./components/main";
 
 function App() {
     // useEffect(() => {
@@ -20,7 +20,8 @@ function App() {
         <UserProvider>
             <Router>
                 <Switch>
-                    <Route path="/" component={Main} />
+                    <Route path="/" exact component={Main} />
+                    <Route path="/signUp" component={SignUp} />
                 </Switch>
             </Router>
         </UserProvider>
