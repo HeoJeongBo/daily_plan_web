@@ -8,6 +8,8 @@ import {
 } from "@material-ui/core";
 import React, { ChangeEvent, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
+import useUserService from "../../services/user/user";
+import type { UserSignUpFields } from "../../types/user/types";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -45,16 +47,21 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-type FormFields = {
-    email: string;
-    password: string;
+type FormFields = UserSignUpFields & {
     confirmPassword: string;
+};
+
+type ErrorFields = {
+    [key: string]: {
+        helperText: string;
+    };
 };
 
 const SignUp: React.FC<RouteComponentProps> = ({
     history,
 }: RouteComponentProps) => {
     const classes = useStyles();
+    const [signUp] = useUserService();
 
     const [fieldsValue, setFieldsValue] = useState<FormFields>({
         email: "",
@@ -62,10 +69,52 @@ const SignUp: React.FC<RouteComponentProps> = ({
         confirmPassword: "",
     });
 
+    const [errorFields, setErrorFields] = useState<ErrorFields>({});
+
     const setField = (event: ChangeEvent<HTMLInputElement>): void => {
         setFieldsValue({
             ...fieldsValue,
             [event.target.id]: event.target.value,
+        });
+    };
+
+    const onSignUp = () => {
+        const errorFields: ErrorFields = {};
+
+        if (
+            !/^[a-zA-Z0-9._-]+@[a-zA-Z09.-]+\.[a-zA-z]{2,4}$/.test(
+                fieldsValue.email
+            )
+        ) {
+            errorFields["email"] = {
+                helperText: "유효하지 않은 이메일입니다.",
+            };
+        }
+        if (fieldsValue.password.length === 0) {
+            errorFields["password"] = {
+                helperText: "비밀번호를 입력해주세요.",
+            };
+        }
+        if (
+            fieldsValue.password.length !== 0 &&
+            fieldsValue.password !== fieldsValue.confirmPassword
+        ) {
+            errorFields["confirmPassword"] = {
+                helperText: "비밀번호와 동일하게 입력해주세요.",
+            };
+        }
+
+        if (!!Object.keys(errorFields).length) {
+            return setErrorFields(errorFields);
+        }
+
+        signUp({
+            email: fieldsValue.email,
+            password: fieldsValue.password,
+        }).then((result) => {
+            if (result) {
+                history.push("/dashboard");
+            }
         });
     };
 
@@ -102,6 +151,7 @@ const SignUp: React.FC<RouteComponentProps> = ({
                     variant="outlined"
                     label="Password"
                     id="password"
+                    type="password"
                     onChange={(e) =>
                         setField(e as ChangeEvent<HTMLInputElement>)
                     }
@@ -118,6 +168,7 @@ const SignUp: React.FC<RouteComponentProps> = ({
                     variant="outlined"
                     label="Confirm Password"
                     id="confirmPassword"
+                    type="password"
                     onChange={(e) =>
                         setField(e as ChangeEvent<HTMLInputElement>)
                     }
@@ -133,6 +184,7 @@ const SignUp: React.FC<RouteComponentProps> = ({
                     variant="contained"
                     color="primary"
                     className={classes.btn}
+                    onClick={onSignUp}
                 >
                     회원가입
                 </Button>

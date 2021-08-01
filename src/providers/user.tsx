@@ -1,17 +1,15 @@
 import React, { createContext, Dispatch, useContext, useReducer } from "react";
-
-type User = {
-    email: string;
-    isLogin: boolean;
-};
+import type { User } from "../types/user/types";
 
 const initialState: User = {
     email: "",
-    isLogin: false,
+    accessToken: "",
+    refreshToken: "",
 };
 
 interface LoginAction {
     type: "LOGIN";
+    data: User;
     //  Login 시 데이터
 }
 // const test = typeof FetchActionType
@@ -19,9 +17,14 @@ interface LogOutAction {
     type: "LOGOUT";
 }
 
-type Action = LoginAction | LogOutAction;
+interface SignUpAction {
+    type: "SIGN_UP";
+    data: User;
+}
 
-type ActionType = Pick<Action, "type">;
+type Action = LoginAction | LogOutAction | SignUpAction;
+
+// type ActionType = Pick<Action, "type">;
 
 type UserDispatch = Dispatch<Action>;
 
@@ -31,11 +34,11 @@ const UserDispatchContext = createContext<UserDispatch>(() => null);
 
 function reducer(state: User, action: Action): User {
     switch (action.type) {
+        case "SIGN_UP":
         case "LOGIN":
-        // return {
-
-        // };
+            return action.data;
         case "LOGOUT":
+            return initialState;
         default:
             throw new Error("Unhandled Action");
     }
@@ -51,6 +54,24 @@ export function UserProvider({ children }: { children: JSX.Element }) {
             </UserDispatchContext.Provider>
         </UserStateContext.Provider>
     );
+}
+
+export function useUserState() {
+    const state = useContext(UserStateContext);
+    if (!state) {
+        throw new Error("Cannot find UserProvider");
+    }
+
+    return state;
+}
+
+export function useUserDispatch() {
+    const dispatch = useContext(UserDispatchContext);
+    if (!dispatch) {
+        throw new Error("Cannot find UserProvider");
+    }
+
+    return dispatch;
 }
 
 export function useUser() {
