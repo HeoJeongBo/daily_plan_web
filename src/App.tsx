@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
-// import { fireStore } from "./firebase/firebaseInit";
 import { UserProvider } from "./providers/user";
 import { SignUp, Main } from "./components/main";
 import { RequestProvider } from "./providers/request";

@@ -25,7 +25,6 @@ interface SignUpAction {
 type Action = LoginAction | LogOutAction | SignUpAction;
 
 // type ActionType = Pick<Action, "type">;
-
 type UserDispatch = Dispatch<Action>;
 
 // state와 dispatch 각각 context로 관리

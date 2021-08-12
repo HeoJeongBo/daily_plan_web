@@ -8,6 +8,7 @@ import type { LoginFormId } from "../../types/main/types";
 import { RouteComponentProps } from "react-router";
 import paths from "../../constants/path";
 import LoginButton from "./LoginButton";
+import useLoginInputStatus from "../../hooks/main/useUserInfoInput";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -105,14 +106,18 @@ const Main: React.FC<RouteComponentProps> = ({
 }: RouteComponentProps) => {
     const classes = useStyles();
 
+    const [loginInput, onChangeInput] = useLoginInputStatus();
     const [focusedElem, setFocusedElem] = useState<LoginFormId>(null);
 
     const onFocusOnInputElem = (event: FocusEvent): void => {
         event.preventDefault();
 
         const targetId: LoginFormId = event.target.id as LoginFormId;
-        console.log(targetId);
         setFocusedElem(targetId);
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        onChangeInput(event);
     };
 
     const renderLeftImage = (): JSX.Element => {
@@ -140,7 +145,7 @@ const Main: React.FC<RouteComponentProps> = ({
                 {renderIdInput()}
                 {renderPasswordInput()}
                 {renderForgotPassword()}
-                <LoginButton history={history} />
+                <LoginButton history={history} userInfo={loginInput} />
                 {renderSignUp()}
             </Grid>
         );
@@ -153,14 +158,19 @@ const Main: React.FC<RouteComponentProps> = ({
                 justifyContent="center"
                 alignItems="flex-end"
                 className={`${classes.inputRoot}${
-                    focusedElem === "id" ? " focus" : ""
+                    focusedElem === "email" ? " focus" : ""
                 }`}
                 onFocus={onFocusOnInputElem}
                 onBlur={onBlurOnInputElem}
             >
                 <FaUserAlt />
                 <Grid item xs={12}>
-                    <TextField fullWidth id="id" label="ID" />
+                    <TextField
+                        fullWidth
+                        id="email"
+                        label="Email"
+                        onChange={handleChange}
+                    />
                 </Grid>
             </Grid>
         );
@@ -185,6 +195,7 @@ const Main: React.FC<RouteComponentProps> = ({
                         id="password"
                         label="Password"
                         type="password"
+                        onChange={handleChange}
                     />
                 </Grid>
             </Grid>

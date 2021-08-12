@@ -1,4 +1,4 @@
 import Main from "./Main";
-import SignUp from "./SingUp";
+import SignUp from "./SignUp";
 
 export { Main, SignUp };

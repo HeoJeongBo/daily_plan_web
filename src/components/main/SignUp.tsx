@@ -5,6 +5,7 @@ import {
     TextField,
     makeStyles,
     Theme,
+    Typography,
 } from "@material-ui/core";
 import React, { ChangeEvent, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
@@ -44,6 +45,10 @@ const useStyles = makeStyles((theme: Theme) =>
             borderRadius: "20px",
             height: "45px",
         },
+        errorText: {
+            color: "red",
+            fontWeight: "bolder",
+        },
     })
 );
 
@@ -52,16 +57,14 @@ type FormFields = UserSignUpFields & {
 };
 
 type ErrorFields = {
-    [key: string]: {
-        helperText: string;
-    };
+    helperText: string;
 };
 
 const SignUp: React.FC<RouteComponentProps> = ({
     history,
 }: RouteComponentProps) => {
     const classes = useStyles();
-    const [signUp] = useUserService();
+    const [{ signUp }] = useUserService();
 
     const [fieldsValue, setFieldsValue] = useState<FormFields>({
         email: "",
@@ -69,7 +72,9 @@ const SignUp: React.FC<RouteComponentProps> = ({
         confirmPassword: "",
     });
 
-    const [errorFields, setErrorFields] = useState<ErrorFields>({});
+    const [errorFields, setErrorFields] = useState<ErrorFields>({
+        helperText: "",
+    });
 
     const setField = (event: ChangeEvent<HTMLInputElement>): void => {
         setFieldsValue({
@@ -79,42 +84,42 @@ const SignUp: React.FC<RouteComponentProps> = ({
     };
 
     const onSignUp = () => {
-        const errorFields: ErrorFields = {};
+        const errorFields: ErrorFields = { helperText: "" };
 
         if (
             !/^[a-zA-Z0-9._-]+@[a-zA-Z09.-]+\.[a-zA-z]{2,4}$/.test(
                 fieldsValue.email
             )
         ) {
-            errorFields["email"] = {
-                helperText: "유효하지 않은 이메일입니다.",
-            };
+            errorFields.helperText = "유효한 이메일이 아닙니다";
         }
         if (fieldsValue.password.length === 0) {
-            errorFields["password"] = {
-                helperText: "비밀번호를 입력해주세요.",
-            };
+            errorFields.helperText = "비밀번호를 입력해주세요.";
         }
         if (
             fieldsValue.password.length !== 0 &&
             fieldsValue.password !== fieldsValue.confirmPassword
         ) {
-            errorFields["confirmPassword"] = {
-                helperText: "비밀번호와 동일하게 입력해주세요.",
-            };
+            errorFields.helperText = "비밀번호와 동일하게 입력해주세요.";
         }
 
-        if (!!Object.keys(errorFields).length) {
+        if (!!errorFields.helperText.length) {
             return setErrorFields(errorFields);
         }
+        requestSignUp(fieldsValue.email, fieldsValue.password);
+    };
 
+    const requestSignUp = (email: string, password: string) => {
         signUp({
             email: fieldsValue.email,
             password: fieldsValue.password,
         }).then((result) => {
             if (result) {
-                history.push("/dashboard");
+                return history.push("/dashboard");
             }
+            return setErrorFields({
+                helperText: "회원가입 중 오류가 발생했습니다.",
+            });
         });
     };
 
@@ -177,6 +182,19 @@ const SignUp: React.FC<RouteComponentProps> = ({
         );
     };
 
+    const renderError = (): JSX.Element | null => {
+        if (!errorFields.helperText.length) {
+            return null;
+        }
+        return (
+            <Grid item>
+                <Typography className={classes.errorText}>
+                    {errorFields.helperText}
+                </Typography>
+            </Grid>
+        );
+    };
+
     const renderSignUpBtn = (): JSX.Element => {
         return (
             <Grid item>
@@ -204,6 +222,7 @@ const SignUp: React.FC<RouteComponentProps> = ({
                 {renderEamil()}
                 {renderPassword()}
                 {renderConfirmPassword()}
+                {renderError()}
                 {renderSignUpBtn()}
             </Grid>
         </div>
