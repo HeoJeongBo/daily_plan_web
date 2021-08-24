@@ -1,7 +1,6 @@
 import React from "react";
 import { History } from "history";
 import { Button, createStyles, makeStyles, Theme } from "@material-ui/core";
-import paths from "../../constants/path";
 import useUserService from "../../services/user/user";
 import { UserSignUpFields } from "../../types/user/types";
 
@@ -27,19 +26,30 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function LoginButton({
     history,
     userInfo,
+    setError,
 }: {
     history: History;
     userInfo: UserSignUpFields;
+    setError: Function;
 }): JSX.Element {
     const classes = useStyles();
-    const [{ login }] = useUserService();
+    const { login } = useUserService();
 
-    const onClickButton = (
+    const onClickButton = async (
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-    ): void => {
+    ) => {
         event.preventDefault();
 
-        // login();
+        try {
+            const loginRequestResult = await login(userInfo);
+            if (loginRequestResult) {
+                return history.push("/dashboard");
+            } else {
+                setError(true);
+            }
+        } catch (e) {
+            setError(true);
+        }
     };
 
     return (

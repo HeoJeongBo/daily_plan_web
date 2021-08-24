@@ -1,1 +1,1 @@
-export type LoginFormId = 'email' | 'password' | null;
+export type LoginFormId = 'email' | 'password';

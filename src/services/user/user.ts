@@ -18,7 +18,7 @@ const useUserService = () => {
             userDispatch({
                 type: 'SIGN_UP',
                 data: {
-                    email: user?.email as string,
+                    email: user!.email as string,
                     accessToken: accessToken as string,
                     refreshToken: user?.refreshToken as string,
                 }
@@ -28,7 +28,6 @@ const useUserService = () => {
         } catch(e) {
             const errorCode: string = e.code;
             requestDispatch({ type: 'REQUEST_ERROR', code: errorCode });
-            console.log('error in user.tx');
             return Promise.resolve(false);
         } finally {
             requestDispatch({ type: 'REQUEST_END'});
@@ -37,16 +36,32 @@ const useUserService = () => {
 
     const login = async (input: UserSignUpFields): Promise<boolean> => {
         try {
+            requestDispatch({type: 'REQUEST_START'});
             const userCredential = await fireBaseAuth.signInWithEmailAndPassword(input.email, input.password);
 
-            console.log(userCredential);
+            const {user} = userCredential;
+            const accessToken = await user!.getIdToken();
+            
+            userDispatch({
+                type: 'LOGIN',
+                data: {
+                    email: user!.email as string,
+                    accessToken: accessToken as string,
+                    refreshToken: user?.refreshToken as string,
+                }
+            });
+
             return Promise.resolve(true);
-        } catch {
+        } catch(e) {
+            const errorCode: string = e.code;
+            requestDispatch({ type: 'REQUEST_ERROR', code: errorCode });
             return Promise.resolve(false);
+        } finally {
+            requestDispatch({type: 'REQUEST_END'});
         }
     }
 
-    return [{signUp, login}];
+    return {signUp, login};
 }
 
 export default useUserService;

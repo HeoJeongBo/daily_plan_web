@@ -1,6 +1,12 @@
 import React, { useState, FocusEvent, MouseEvent } from "react";
 import Grid from "@material-ui/core/Grid";
-import { createStyles, makeStyles, TextField, Theme } from "@material-ui/core";
+import {
+    createStyles,
+    makeStyles,
+    TextField,
+    Theme,
+    Typography,
+} from "@material-ui/core";
 import MainLeftImage from "../../assets/images/main_image.svg";
 import { FaLock, FaUserAlt } from "react-icons/fa";
 
@@ -98,6 +104,10 @@ const useStyles = makeStyles((theme: Theme) =>
                 cursor: "pointer",
             },
         },
+        errorText: {
+            color: "red",
+            fontWeight: "bolder",
+        },
     })
 );
 
@@ -107,7 +117,8 @@ const Main: React.FC<RouteComponentProps> = ({
     const classes = useStyles();
 
     const [loginInput, onChangeInput] = useLoginInputStatus();
-    const [focusedElem, setFocusedElem] = useState<LoginFormId>(null);
+    const [focusedElem, setFocusedElem] = useState<LoginFormId | null>(null);
+    const [isError, setIsError] = useState<boolean>(false);
 
     const onFocusOnInputElem = (event: FocusEvent): void => {
         event.preventDefault();
@@ -145,7 +156,12 @@ const Main: React.FC<RouteComponentProps> = ({
                 {renderIdInput()}
                 {renderPasswordInput()}
                 {renderForgotPassword()}
-                <LoginButton history={history} userInfo={loginInput} />
+                {renderError()}
+                <LoginButton
+                    history={history}
+                    userInfo={loginInput}
+                    setError={setIsError}
+                />
                 {renderSignUp()}
             </Grid>
         );
@@ -198,6 +214,20 @@ const Main: React.FC<RouteComponentProps> = ({
                         onChange={handleChange}
                     />
                 </Grid>
+            </Grid>
+        );
+    };
+
+    const renderError = (): JSX.Element | null => {
+        if (!isError) {
+            return null;
+        }
+
+        return (
+            <Grid item>
+                <Typography className={classes.errorText}>
+                    로그인중 에러가 발생했습니다.
+                </Typography>
             </Grid>
         );
     };

@@ -64,7 +64,7 @@ const SignUp: React.FC<RouteComponentProps> = ({
     history,
 }: RouteComponentProps) => {
     const classes = useStyles();
-    const [{ signUp }] = useUserService();
+    const { signUp } = useUserService();
 
     const [fieldsValue, setFieldsValue] = useState<FormFields>({
         email: "",
